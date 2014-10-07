@@ -26,7 +26,8 @@ procedure Morpion is
    
    -- Variables
    Plateau : T_Tableau;
-   FinDePartie : T_FinDePartie  := Non; 
+   FinDePartie : T_FinDePartie  := Non;
+   
    J : T_Joueur;
    
    NbreCasesRempli : Integer := 0;
@@ -34,9 +35,6 @@ procedure Morpion is
    MaxJoueurs : constant Integer := 2;
    
    G : Aleatoire.Generator; 
-     
-   
-   -- ************ Procédures **************
    
    -- ** Affiche **
    -- => Affiche un plateau 
@@ -48,7 +46,6 @@ procedure Morpion is
 	 
 	for X in Ligne loop
 	   for Y in Colonne loop   
-	   --NumCase := X + Y * NbreColonnes; 
 	   Put(" " & T(X,Y) & " ");
 
 	   if Y /= 'C' then 
@@ -71,60 +68,70 @@ procedure Morpion is
    end Affiche;
    
    
-   -- ** Joue **
-   -- => Demande au joueur la position de sa case choisie
-   -- => Vérifie que la case n'est pas occupée
-   -- => Si oui, l'ajoute dans le plateau 
-   -- => Si toutes les cases du plateau sont occupées = Match nul et quitte la partie (et le programme) 
-  procedure Joue (T : in out T_Tableau; J : T_Joueur; FinDePartie : in out T_FinDePartie) is 
-     B : Boolean := True;
-     S : Unbounded_String;
-     X,Y : Character;
-     
-     Bool : Boolean := True;
-  begin
-     while (B and NbreCasesRempli <  (Ligne'width * Colonne'width) ) loop
-
-	
-	while Bool loop
+   -- ** Saisie ** 
+   -- => Saisie des coordonnées du joueur 
+   -- => Modifie les variables X, Y ( caractères correspondant respectivement aux subtypes Colonne et Ligne)
+   procedure Saisie (X,Y : in out Character) is 
+      Valide : Boolean := False;
+      S : Unbounded_String;
+   begin      
+      	while (not Valide) loop
 	   Put("Coordonnées (C1 par exemple) : ");
 	   S := Get_Line;
 	   if ( Length(S) >= 2) then 
 	     if (Element(S,1) in Colonne and Element(S,2) in Ligne) then
-	      X := Element(S,2);
-	      Y := Element(S,1);
-	      Bool := False;
+		X := Element(S,2);
+		Y := Element(S,1);
+		valide := True;
 	     end if;
 	   end if;
 	end Loop;
-
-	  if T(X,Y) = ' ' then 
+   end Saisie;
+   
+   
+   -- ** Joue **
+   -- => Demande au joueur la position de sa case choisie
+   -- => Vérifie que la case n'est pas occupée
+   -- => Si oui, l'ajoute dans le plateau 
+  procedure Joue (T : in out T_Tableau; J : T_Joueur) is 
+     OK : Boolean := False;
+     X,Y : Character := ' ';
+  begin
+     while (not OK and NbreCasesRempli <  (Ligne'width * Colonne'width) ) loop
+	Saisie(X,Y);
+	
+	if T(X,Y) = ' ' then 
 	   case J is 
 	      when Joueur1 => T(X,Y) := 'O';
 	      when Joueur2 => T(X,Y) := 'X';
 	   end case;
-	   B := False;
+	   OK := True;
 	   NbreCasesRempli := NbreCasesRempli + 1; 
-	  else
-	     Put_Line("Cette case est déjà prise...");
-	  end if;
-	  
-	  if NbreCasesRempli >= (Ligne'width * Colonne'width) then 
-	     FinDePartie := Egalite;
-	  end if;
-	  
+	else
+	   Put_Line("Cette case est déjà prise...");
+	end if;
+	
      end loop;
-  end Joue;     
+  end Joue;  
+  
+  -- ** Nul **
+  -- => Teste si le plateau est rempli (ce qui revient à dire qu'il y a une égalité)
+  function Nul return T_FinDePartie is 
+  begin
+     if NbreCasesRempli >= (Ligne'width * Colonne'width) then 
+	return Egalite;
+     else 
+	return Non;
+     end if;
+  end Nul;
      
   -- ** Gagne **
   -- => Vérifie si un joueur a gagné ou non 
-  function Gagne (T : T_Tableau) return T_FinDePartie is
-  --NumCase : Integer;   
+  function Gagne (T : T_Tableau) return T_FinDePartie is  
   begin
      
      -- Lignes
      for X in Ligne loop
-	-- Numcase := Y * NbreColonnes + 1; 
 	if (T(X,'A') = T(X,'B') and T(X,'B') = T(X,'C') and T(X,'A') /= ' ' ) then 
 	   FinDePartie := Victoire;
 	end if;
@@ -166,6 +173,7 @@ procedure Morpion is
   end Initialisation;
     
   Ch : Unbounded_String;
+  J1, J2 : Unbounded_String;
 begin
    -- Initialise le générateur de nombres aléatoires 
    Reset(G);
@@ -173,7 +181,7 @@ begin
    Put_Line("Bienvenue dans le jeu du (Super) Morpion !...");
    Put_Line("Faites [Entrée] pour commencer !");
    Ch := Get_Line;
-   
+    
    --Initialisation
    Plateau := Initialisation;
    I := Random(G);
@@ -187,10 +195,11 @@ begin
       end case;
       Put_Line("C'est au tour du " & T_Joueur'Image(J));
       Affiche(Plateau);
-      Joue(Plateau,J, FinDePartie);
+      Joue(Plateau,J);
 
-      I := I + 1;
+      FinDePartie := Nul;
       FinDePartie := Gagne(Plateau);
+      I := I + 1;
    end loop;
    
    Put(ASCII.ESC & "[2J"); -- Commande clear 
