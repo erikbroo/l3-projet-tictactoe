@@ -2,11 +2,12 @@ with Ada.Text_Io;
 with Ada.Numerics.Discrete_Random;
 with Ada.Strings.Unbounded.Text_Io;
 with Ada.Strings.Unbounded;
+with Joueurs;
 
 use Ada.Strings.Unbounded;
 use Ada.Strings.Unbounded.Text_Io;
 use Ada.Text_Io;
-
+use Joueurs;
 
 procedure Morpion is
    
@@ -14,9 +15,6 @@ procedure Morpion is
    subtype Intervalle is Integer range 1..100 ;
    package Aleatoire is new Ada.Numerics.Discrete_Random( Intervalle ) ;
    use Aleatoire;
-   
-   -- Types de variables
-   type T_Joueur is (Joueur1, Joueur2);
    
    subtype Ligne is Character range '1'..'3';
    subtype Colonne is Character range 'A'..'C';
@@ -32,15 +30,6 @@ procedure Morpion is
    MaxJoueurs : constant Integer := 2;
    
    G : Aleatoire.Generator;
-   
-   -- enregistrement de Joueur
-   type Joueur is record
-     NumJoueur : T_Joueur;
-     Nom : Unbounded_String;
-     Symbole : Character;
-     IA : Boolean;
-   end record;
-
    
    -- ** Affiche **
    -- => Affiche un plateau 
@@ -76,21 +65,35 @@ procedure Morpion is
    -- => Saisie des coordonnées du joueur 
    -- => Modifie les variables X, Y ( caractères correspondant respectivement aux subtypes Colonne et Ligne)
    procedure Saisie (X,Y : in out Character) is 
+      COORDONNEES_INCORRECTES : exception;
       Valide : Boolean := False;
       S : Unbounded_String;
    begin      
-      	while (not Valide) loop
-	   Put("Coordonnées (C1 par exemple) : ");
-	   S := Get_Line;
-	   if ( Length(S) >= 2) then 
-	     if (Element(S,1) in Colonne and Element(S,2) in Ligne) then
-		X := Element(S,2);
-		Y := Element(S,1);
-		valide := True;
-	     end if;
+      
+      while (not Valide) loop
+	 Put("Saisissez les coordonnées (C1 par exemple) : ");
+	 S := Get_Line;
+	 if ( Length(S) >= 2) then 
+	    
+	    --tester si la saisie est correcte et declencher une exception sinon
+	TRY : begin
+	   if (Element(S,1) in Colonne and Element(S,2) in Ligne) then
+	      X := Element(S,2);
+	      Y := Element(S,1);
+	      valide := True;
+	   else raise COORDONNEES_INCORRECTES ;
 	   end if;
-	end Loop;
+	   
+	exception
+	   when COORDONNEES_INCORRECTES => put_line("Coordonnées incorrectes") ;
+	end TRY;
+	
+	 end if;
+      end Loop;
+      
    end Saisie;
+   
+   
    
    
    -- ** Joue **
@@ -103,14 +106,14 @@ procedure Morpion is
       X,Y : Character := ' ';
    begin
       while (not OK and NbreCasesRempli <  (Ligne'width * Colonne'width) ) loop
-	 if (not J.IA) then 
+	 if ( not Get_IA(J) ) then 
 	    Saisie(X,Y);
 	 -- else 
 	    -- Renvoie les coordonnées de la case de l'IA 
 	 end if;
 	 
 	 if T(X,Y) = ' ' then 
-	    case J.NumJoueur is 
+	    case Get_NumJoueur(J) is 
 	       when Joueur1 => T(X,Y) := 'O';
 	       when Joueur2 => T(X,Y) := 'X';
 	    end case;
@@ -181,25 +184,27 @@ procedure Morpion is
       
    end Initialisation;
    
-   function Initialisation_Joueur (NJ : T_Joueur) return Joueur is
-      J : Joueur;
-   begin   
-      -- Saisie du nom du joueur 
-      Put_Line("Entrez le nom du " & T_Joueur'Image(NJ) & " :" );
-      J.Nom := Get_Line;
-      case NJ is
-	 -- Définit le symbole, le numéro du joueur 1 
-	 when Joueur1 => 
-	   J.Symbole := 'O';
-	   J.NumJoueur := Joueur1;
-	 -- Définit le symbole, le numéro du joueur 2
-	 when Joueur2 =>
-	   J.Symbole := 'X';
-	   J.NumJoueur := Joueur2;
-      end case;
-      J.IA := False;
-      return J;
-   end Initialisation_Joueur;
+   
+   -- ****
+   --  function Initialisation_Joueur (NJ : T_Joueur) return Joueur is
+   --     J : Joueur;
+   --  begin   
+   --     -- Saisie du nom du joueur 
+   --     Put_Line("Entrez le nom du " & T_Joueur'Image(NJ) & " :" );
+   --     J.Nom := Get_Line;
+   --     case NJ is
+   --  	 -- Définit le symbole, le numéro du joueur 1 
+   --  	 when Joueur1 => 
+   --  	   J.Symbole := 'O';
+   --  	   J.NumJoueur := Joueur1;
+   --  	 -- Définit le symbole, le numéro du joueur 2
+   --  	 when Joueur2 =>
+   --  	   J.Symbole := 'X';
+   --  	   J.NumJoueur := Joueur2;
+   --     end case;
+   --     J.IA := False;
+   --     return J;
+   --  end Initialisation_Joueur;
       
    
    Ch : Unbounded_String;
@@ -212,8 +217,8 @@ begin
    Put_Line("Faites [Entrée] pour commencer !");
    Ch := Get_Line;
    
-   J1 := Initialisation_Joueur(Joueur1);
-   J2 := Initialisation_Joueur(Joueur2);
+   J1 := Initialisation_Joueur(Joueur1, False);
+   J2 := Initialisation_Joueur(Joueur2, False);
    
    --Initialisation
    Plateau := Initialisation;
@@ -226,7 +231,7 @@ begin
        	 when 0 => JoueurCourant := J2;
 	 when Others => Put_Line("Erreur");
       end case;
-      Put_Line("C'est au tour du joueur " & To_String(JoueurCourant.Nom) & " (Symbole '" & JoueurCourant.Symbole & "')" );
+      Put_Line("C'est au tour du joueur " & Get_Nom(JoueurCourant) & " (Symbole '" & Get_Symbole(JoueurCourant) & "')" );
       Affiche(Plateau);
       Joue(Plateau,JoueurCourant);
 
@@ -239,7 +244,7 @@ begin
    Affiche(Plateau);
    
    case FinDePartie is 
-      when Victoire => Put_line("Victoire du joueur " & JoueurCourant.Nom);
+      when Victoire => Put_line("Victoire du joueur " & Get_NOm(JoueurCourant));
       when Egalite  => Put_Line("Match nul !!");
       when Non => Put_Line ("Wtf o_O ? Tu as planté mon programme !"); 
    end case;
