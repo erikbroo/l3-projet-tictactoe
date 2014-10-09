@@ -10,7 +10,7 @@ Package Joueurs is
    type Joueur is private;
    type T_Joueur is (Joueur1, Joueur2);
    
-   -- Constructeur 
+   -- Constructeur de joueur
    function Initialisation_Joueur (NJ : T_Joueur; IA : Boolean) return Joueur;
    
    -- Getters
