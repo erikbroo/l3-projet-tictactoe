@@ -1,0 +1,34 @@
+with Ada.Text_Io, Ada.Integer_Text_IO;
+with Ada.Strings.Unbounded.Text_Io;
+with Ada.Strings.Unbounded;
+
+use Ada.Strings.Unbounded;
+use Ada.Strings.Unbounded.Text_Io;
+use Ada.Text_Io, Ada.Integer_Text_IO;
+
+procedure Choix is
+   CHOIX_INCORRECTE :exception;
+   Choix : Integer:=0;
+   Reessayer : Unbounded_String;
+BEGIN
+   While (Choix /= 1 AND Choix /= 2 AND Choix /= 3) loop
+      TRY:begin
+      Put_Line("Pour jouer contre l'ordinateur tapez 1");
+      Put_Line("Pour jouer contre un autre joueur tapez 2");
+      Put_Line("Pour quitter taper 3");
+      Get(Choix);
+      
+      case Choix is
+         when 1 => Put_Line("Cette fonction est en cours de construction");
+         when 2 => Put_Line("morpion");
+         when 3 => Put_Line("Au revoir !");exit;
+         when others => raise CHOIX_INCORRECTE;
+      end case;
+      exception
+         when CHOIX_INCORRECTE => Put_Line ("Votre choix est incorrecte. Cliquez sur la touche [Entree] pour reessayer");Skip_Line;New_Line;
+            Reessayer := Get_Line;
+         when others => New_Line; Put_Line ("ERREUR ! ");Skip_Line;New_Line;Put_Line("Cliquez sur la touche [Entree] pour reessayer");
+            Reessayer := Get_Line;
+      end TRY;
+   end loop;
+end Choix;
