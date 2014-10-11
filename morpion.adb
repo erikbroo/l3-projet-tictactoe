@@ -13,6 +13,7 @@ procedure Morpion is
    
    -- type 
    type T_FinDePartie is (Victoire, Egalite, Non);
+   FinDePartie : T_FinDePartie  := Non;
    
    -- Permet la génération d'un nombre aléatoire
    subtype Intervalle is Integer range 1..100 ;
@@ -134,7 +135,6 @@ procedure Morpion is
    
       -- Variables
    PlateauJeu : Plateau;	
-   FinDePartie : T_FinDePartie  := Non;
    I : Integer := 1; -- Numéro du joueur courant
    MaxJoueurs : constant Integer := 2;
    Ch : Unbounded_String;
