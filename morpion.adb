@@ -13,6 +13,7 @@ procedure Morpion is
    
    -- type 
    type T_FinDePartie is (Victoire, Egalite, Non);
+   FinDePartie : T_FinDePartie  := Non;
    
    -- Permet la génération d'un nombre aléatoire
    subtype Intervalle is Integer range 1..100 ;
@@ -85,9 +86,9 @@ procedure Morpion is
    function Nul (P : Plateau) return T_FinDePartie is 
    begin
       if Plateau_Plein(P) then 
-	 return Egalite;
+   	 return Egalite;
       else 
-	 return Non;
+   	 return Non;
       end if;
    end Nul;
    
@@ -98,43 +99,42 @@ procedure Morpion is
       
       -- Lignes
       for X in Ligne loop
-	 if (Get_Case(P, X,'A') = Get_Case(P, X,'B') 
-	       and Get_Case(P, X,'B') = Get_Case(P, X,'C') 
-	       and not Case_Vide(P, X,'A')) then 
-	    FinDePartie := Victoire;
-	 end if;
+   	 if (Get_Case(P, X,'A') = Get_Case(P, X,'B') 
+   	       and Get_Case(P, X,'B') = Get_Case(P, X,'C') 
+   	       and not Case_Vide(P, X,'A')) then 
+   	    FinDePartie := Victoire;
+   	 end if;
       end loop;
       
       -- Colonnes
       for Y in Colonne loop
-	 if (Get_Case(P, '1',Y) = Get_Case(P, '2',Y) 
-	       and Get_Case(P, '2',Y) = Get_Case(P, '3',Y) 
-	       and not Case_Vide(P, '1',Y)) 
-	 then 
-	    FinDePartie := Victoire;
-	 end if;
+   	 if (Get_Case(P, '1',Y) = Get_Case(P, '2',Y) 
+   	       and Get_Case(P, '2',Y) = Get_Case(P, '3',Y) 
+   	       and not Case_Vide(P, '1',Y)) 
+   	 then 
+   	    FinDePartie := Victoire;
+   	 end if;
       end loop;
       
       -- Diagonales
        if (Get_Case(P, '1','A') = Get_Case(P, '2','B') 
-	     and Get_Case(P, '2','B') = Get_Case(P, '3','C')
-	     and not Case_Vide(P, '1','A'))
+   	     and Get_Case(P, '2','B') = Get_Case(P, '3','C')
+   	     and not Case_Vide(P, '1','A'))
        then 
-	 FinDePartie := Victoire;
+   	 FinDePartie := Victoire;
       end if;
       
       if (Get_Case(P, '1','C') = Get_Case(P, '2','B') 
-	    and Get_Case(P, '2','B') = Get_Case(P, '3','A') 
-	    and not Case_Vide(P, '1','C'))
+   	    and Get_Case(P, '2','B') = Get_Case(P, '3','A') 
+   	    and not Case_Vide(P, '1','C'))
       then 
-	 FinDePartie := Victoire;
+   	 FinDePartie := Victoire;
       end if;
       return FinDePartie;
    end Gagne;
    
       -- Variables
    PlateauJeu : Plateau;	
-   FinDePartie : T_FinDePartie  := Non;
    I : Integer := 1; -- Numéro du joueur courant
    MaxJoueurs : constant Integer := 2;
    Ch : Unbounded_String;
