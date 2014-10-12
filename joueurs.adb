@@ -1,3 +1,7 @@
+with Ada.Text_Io;
+with Plateaux;
+use Plateaux;
+use Ada.Text_Io;
 package body Joueurs is
    
       function Initialisation_Joueur (NJ : T_Joueur; IA : Boolean) return Joueur is
@@ -72,5 +76,55 @@ package body Joueurs is
    begin
       J.IA := B;
    end Set_IA;
-
+      -- ** Gagne **
+   -- => Vérifie si un joueur a gagné ou non 
+   function Gagne (P : Plateau; J : Joueur) return T_FinDePartie is 
+   begin
+      -- Lignes
+      for X in Ligne loop
+	 if (Get_Case(P, X,'A') = Get_Case(P, X,'B') 
+	       and Get_Case(P, X,'B') = Get_Case(P, X,'C') 
+	       and not Case_Vide(P, X,'A')) then 
+	    if Get_Case(P,X,'A') = Get_Symbole(J) then return Victoire;
+	    else return Defaite;
+	    end if;
+	 end if;
+      end loop;
+      
+      -- Colonnes
+      for Y in Colonne loop
+	 if (Get_Case(P, '1',Y) = Get_Case(P, '2',Y) 
+	       and Get_Case(P, '2',Y) = Get_Case(P, '3',Y) 
+	       and not Case_Vide(P, '1',Y)) 
+	 then 	 
+	    if Get_Case(P,'1',Y) = Get_Symbole(J) then return Victoire;
+	    else return Defaite;
+	    end if;
+	 end if;
+      end loop;
+      
+      -- Diagonales
+      if (Get_Case(P, '1','A') = Get_Case(P, '2','B') 
+	    and Get_Case(P, '2','B') = Get_Case(P, '3','C')
+	    and not Case_Vide(P, '1','A'))
+      then 
+	 if Get_Case(P,'1','A') = Get_Symbole(J) then return Victoire;
+	 else return Defaite;
+	 end if;
+      end if;
+      
+      if (Get_Case(P, '1','C') = Get_Case(P, '2','B') 
+	    and Get_Case(P, '2','B') = Get_Case(P, '3','A') 
+	    and not Case_Vide(P, '1','C'))
+      then 
+	 if Get_Case(P,'1','C') = Get_Symbole(J) then return Victoire;
+	 else return Defaite;
+	 end if;
+      end if;
+      
+      if Plateau_Plein(P) then
+	 return Egalite;
+      end if;
+      return Non;
+   end Gagne;
 end Joueurs;

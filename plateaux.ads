@@ -9,9 +9,9 @@ use Ada.Text_Io;
 
 package Plateaux is
    type Plateau is private;
-   
    subtype Ligne is Character range '1'..'3';
    subtype Colonne is Character range 'A'..'C';
+   type T_FinDePartie is (Victoire,Defaite,Egalite,Non);
    type T_Tableau is array(Ligne, Colonne) of Character;
    
    -- Constructeur Plateau

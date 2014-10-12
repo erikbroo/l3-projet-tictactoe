@@ -1,10 +1,12 @@
 with Ada.Text_Io;
 with Ada.Strings.Unbounded.Text_Io;
 with Ada.Strings.Unbounded;
+with Plateaux;
 
 use Ada.Strings.Unbounded;
 use Ada.Strings.Unbounded.Text_Io;
 use Ada.Text_Io;
+use Plateaux;
 
 Package Joueurs is
    type Joueur is private;
@@ -26,6 +28,8 @@ Package Joueurs is
    procedure Set_Symbole (J : out Joueur; S : in Character);
    procedure Set_IA (J : out Joueur; B : in Boolean);
    
+   -- function
+   function Gagne (P : Plateau; J : Joueur) return T_FinDePartie;
    
 private
    

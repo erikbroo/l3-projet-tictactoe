@@ -49,8 +49,12 @@ package body Plateaux is
    begin
   Try : 
       begin 
-      P.Tableau(X,Y) := C;
-      P.NbreCasesRemplies :=  P.NbreCasesRemplies + 1;
+	 P.Tableau(X,Y) := C;
+	 if(C /= ' ') then
+	    P.NbreCasesRemplies :=  P.NbreCasesRemplies + 1;
+	 else
+	    P.NbreCasesRemplies :=  P.NbreCasesRemplies - 1;
+	 end if;
       exception 
 	    when COORDONNEES_INVALIDES => Put_Line("Coordonnées invalides dans la fonction Update_Plateau");
       end Try;
