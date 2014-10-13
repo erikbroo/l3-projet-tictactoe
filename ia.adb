@@ -44,7 +44,7 @@ package body Ia is
       Max : Integer := -10000;
       Tmp : Integer;
    begin
-      if (not (Profondeur /= 0 and Gagne(P,J) = Non)) then
+      if (not (Profondeur /= 0 and Resultat(P,J) = Non)) then
 	 return Evaluation(P,Profondeur,J);
       else
 	 for X in Ligne loop
@@ -70,7 +70,7 @@ package body Ia is
       Min : Integer := 10000;
       Tmp : Integer;
    begin
-      if (not (Profondeur /= 0 and Gagne(P,J) = Non)) then
+      if (not (Profondeur /= 0 and Resultat(P,J) = Non)) then
 	 return Evaluation(P,Profondeur,J);
       else	 
 	 for X in Ligne loop
@@ -126,7 +126,7 @@ package body Ia is
       Pions : Couple_I;
       Alignement : C_Tableau;
    begin
-      N := Gagne(P,J);
+      N := Resultat(P,J);
 
       if Profondeur = 0 or N /= Non  then
 	  case N is

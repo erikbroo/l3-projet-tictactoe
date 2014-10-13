@@ -9,6 +9,7 @@ use Ada.Strings.Unbounded.Text_Io;
 use Ada.Text_Io;
 use Joueurs, Plateaux, Ia;
 
+
 procedure Morpion is
 
    -- Permet la génération d'un nombre aléatoire
@@ -82,18 +83,8 @@ procedure Morpion is
       end loop;
    end Joue;  
    
-   -- ** Nul **
-   -- => Teste si le plateau est rempli (ce qui revient à dire qu'il y a une égalité)
-   --  function Nul (P : Plateau) return T_FinDePartie is 
-   --  begin
-   --     if Plateau_Plein(P) then 
-   --  	 return Egalite;
-   --     else 
-   --  	 return Non;
-   --     end if;
-   --  end Nul;
    
-   -- fonction menu 
+   -- ** Menu ** 
    procedure Menu (J1, J2 : out Joueur; Choix : out Integer ) is
       CHOIX_INCORRECTE :exception;
       Reessayer : Unbounded_String;
@@ -130,12 +121,10 @@ procedure Morpion is
       
    end Menu;
    
-   
-   
    -- Variables
    PlateauJeu : Plateau;	
    FinDePartie : T_FinDePartie  := Non;
-   I : Integer := 1; -- Numéro du joueur courant
+   NumJoueurCourant : Integer := 1; -- Numéro du joueur courant
    MaxJoueurs : constant Integer := 2;
    Ch : Unbounded_String;
    J1, J2, JoueurCourant,JoueurEnAttente : Joueur;
@@ -152,44 +141,41 @@ begin
    
    Menu(J1,J2,Choix);
    
-   
-   
    if (Choix /= 3) then 
-   --Initialisation
-   PlateauJeu := Initialisation_Plateau;
-   I := Random(G);
-   
-   while (FinDePartie = Non) loop 
-      Put(ASCII.ESC & "[2J"); -- Commande clear 
-      case (I mod MaxJoueurs) is
-	 when 1 => 
-	    JoueurCourant := J1;
-	    JoueurEnAttente := J2;
-       	 when 0 => 
-	    JoueurCourant := J2;
-	    JoueurEnAttente := J1;
-	 when Others => Put_Line("Erreur");
-      end case;
-      if(not Get_IA(JoueurCourant)) then
-	 Put_Line("C'est au tour du joueur " & Get_Nom(JoueurCourant) & " (Symbole '" & Get_Symbole(JoueurCourant) & "')" );
-      end if;
-      Affiche_Plateau(PlateauJeu);
-      Joue(PlateauJeu,JoueurCourant,JoueurEnAttente,9);
+      --Initialisation
+      PlateauJeu := Initialisation_Plateau;
+      NumJoueurCourant := Random(G);
+      
+      while (FinDePartie = Non) loop 
+	 Put(ASCII.ESC & "[2J"); -- Commande clear 
+	 case (NumJoueurCourant mod MaxJoueurs) is
+	    when 1 => 
+	       JoueurCourant := J1;
+	       JoueurEnAttente := J2;
+	    when 0 => 
+	       JoueurCourant := J2;
+	       JoueurEnAttente := J1;
+	    when Others => Put_Line("Erreur");
+	 end case;
+	 if(not Get_IA(JoueurCourant)) then
+	    Put_Line("C'est au tour du joueur " & Get_Nom(JoueurCourant) & " (Symbole '" & Get_Symbole(JoueurCourant) & "')" );
+	 end if;
+	 Affiche_Plateau(PlateauJeu);
+	 Joue(PlateauJeu,JoueurCourant,JoueurEnAttente,9);
 
-      -- FinDePartie := Nul(PlateauJeu);
-      FinDePartie := Gagne(PlateauJeu,JoueurCourant);
-      I := I + 1;
-   end loop;
-   
-   Put(ASCII.ESC & "[2J"); -- Commande clear 
-   Affiche_Plateau(PlateauJeu);
-   
-   case FinDePartie is 
-      when Victoire => Put_line("Victoire du joueur " & Get_NOm(JoueurCourant));
-      when Defaite => Put_Line("La defaite n'est pas envisagable !");
-      when Egalite  => Put_Line("Match nul !!");
-      when Non => Put_Line ("Wtf o_O ? Tu as planté mon programme !"); 
-   end case;
+	 FinDePartie := Resultat(PlateauJeu,JoueurCourant);
+	 NumJoueurCourant := NumJoueurCourant + 1;
+      end loop;
+      
+      Put(ASCII.ESC & "[2J"); -- Commande clear 
+      Affiche_Plateau(PlateauJeu);
+      
+      case FinDePartie is 
+	 when Victoire => Put_line("Victoire du joueur " & Get_NOm(JoueurCourant));
+	 when Defaite => Put_Line("La defaite n'est pas envisagable !");
+	 when Egalite  => Put_Line("Match nul !");
+	 when Non => Put_Line ("Erreur ! La partie s'est terminée de façon imprévue "); 
+      end case;
    end if;
    
 end Morpion;

@@ -29,7 +29,7 @@ Package Joueurs is
    procedure Set_IA (J : out Joueur; B : in Boolean);
    
    -- function
-   function Gagne (P : Plateau; J : Joueur) return T_FinDePartie;
+   function Resultat (P : Plateau; J : Joueur) return T_FinDePartie;
    
 private
    

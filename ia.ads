@@ -21,5 +21,6 @@ package ia is
    function CalcScore(Cntpion,Cntjoueur : Integer) return Integer;
    function TestLigne(C : C_Tableau; J : Joueur) return Couple_I;
    function Evaluation(Pl : Plateau; Profondeur : Integer; J : Joueur) return Integer;
+   
 end ia;
   

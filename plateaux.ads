@@ -34,7 +34,7 @@ package Plateaux is
    function Plateau_Vide (P : Plateau) return Boolean;
    function Case_Vide (P: Plateau; X : Ligne; Y : Colonne) return Boolean;
    function Plateau_Plein (P: Plateau) return Boolean;
-     
+   
 private
    type Plateau is record
      Tableau : T_Tableau;
