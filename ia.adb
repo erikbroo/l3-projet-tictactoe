@@ -14,6 +14,7 @@ package body Ia is
    package Aleatoire is new Ada.Numerics.Discrete_Random(Intervalle);
    use Aleatoire;
    
+   -- coeur de l'IA cette fonction renvoie la case la plus appropriée à jouer
    function CalcIA(Pl : Plateau; Profondeur : Integer; J,J2 : Joueur) return Couple_C is
       P : Plateau := Pl;
       MaxCourant : Integer := -10000;
@@ -37,6 +38,7 @@ package body Ia is
       return Coor;
    end CalcIA;
    
+   -- Fonctionne de pair avec la fonction CalcMin elle simule les cases jouées par l'IA et cherche à maximiser le score (c'est-à-dire à chercher le meilleur coup possible pour l'IA)
    function CalcMax(Pl : in  Plateau; Profondeur : Integer; J,J2 : Joueur) return Integer is
        P : Plateau := Pl;
       Max : Integer := -10000;
@@ -62,7 +64,7 @@ package body Ia is
       end if;
    end CalcMax;
    
-
+   -- Fonctionne de pair avec la fonction CalcMax elle simule les cases jouées par le joueur et cherche à minimiser le score (c'est-à-dire à chercher le meilleur coup possible pour le joueur ou le pire coup pour l'IA)
    function CalcMin(Pl : Plateau;Profondeur : Integer; J,J2 : Joueur) return Integer is
       P : Plateau := Pl;
       Min : Integer := 10000;
@@ -97,7 +99,7 @@ package body Ia is
       end case;
    end CalcScore;
    
-   -- Evalue une ligne et revoie le résultat sous forme de couple
+   -- Evalue une ligne et revoie le résultat sous forme de couple (permet facilement de lui attribuer un score par la suite)
    function TestLigne(C : C_Tableau; J : Joueur) return Couple_I is
       Pion : Couple_I;
    begin
@@ -116,7 +118,7 @@ package body Ia is
       return Pion;
    end TestLigne;
    
-   -- Evalue la valeur des cases à un Etat n du plateau
+   -- Evalue la valeur des cases à un Etat n du plateau (c'est-à-dire le score du plateau si celui-ci est positif/nul/négatif respectivement indique une victoire/égalité/défaite)
    function Evaluation(Pl :Plateau;Profondeur : Integer; J : Joueur) return Integer is
       P : Plateau := Pl;
       N : T_FinDePartie;
@@ -129,9 +131,9 @@ package body Ia is
       if Profondeur = 0 or N /= Non  then
 	  case N is
 	     when Victoire => 
-	       return +1000 - ComptePions(P);
+		return +1000 - Get_NbreCasesRemplies(P);
 	     when Defaite =>
-	       return -1000 + ComptePions(P);
+		return -1000 + Get_NbreCasesRemplies(P);
 	     when Others =>
 		return 0;
 	  end case;
@@ -160,18 +162,4 @@ package body Ia is
      end if;
    End Evaluation;
    
-   -- Compte le nombre de pions sur le plateau
-   function comptePions(Pl : Plateau) return Integer is
-      cnt: Integer := 0;
-      P : Plateau := Pl;
-   begin
-      for X in Ligne loop
-	 for Y in Colonne loop
-	    if Get_case(P,X,Y)/=' ' then
-	       cnt:=cnt+1;
-	    end if;
-	 end loop;
-      end loop;
-      return cnt;
-   end comptePions;
 end Ia;
